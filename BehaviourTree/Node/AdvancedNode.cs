@@ -1,5 +1,7 @@
 namespace ActioinFramework.BehaviourTree.BehaviourNode;
 
+[NodeXmlName("sequence")]
+[NodeXmlProperty("index", "currentIndex")]
 public class SequenceNode : CompositeNode {
     public int CurrentIndex => currentIndex;
     private int currentIndex = 0;
