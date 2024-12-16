@@ -1,6 +1,6 @@
 using System.Reflection;
 using ActioinFramework.BehaviourTree.BehaviourNode;
-
+using Newtonsoft.Json;
 namespace ActioinFramework.BehaviourTree.Xml;
 
 public class NodeXmlDefinition(Type nodeType, string nodeName) {
@@ -9,6 +9,11 @@ public class NodeXmlDefinition(Type nodeType, string nodeName) {
 
     public static NodeXmlDefinition? GetDefinition(string name) {
         return allDefinitions.Find(item => item.nodeName == name);
+    }
+
+    public static void BuildJsonFile(string filePath) {
+        string json = JsonConvert.SerializeObject(new { definitions = allDefinitions });
+        File.WriteAllText(filePath, json);
     }
 
     static NodeXmlDefinition() {
@@ -40,5 +45,12 @@ public class NodeXmlDefinition(Type nodeType, string nodeName) {
         FieldInfo fieldInfo = nodeType.GetField(fieldName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
         ?? throw new MissingFieldException($"{nodeType.FullName}上不存在{fieldName}字段");
         fieldMap.Add(attributeName, fieldInfo);
+    }
+
+    public object ToJson() {
+        return new {
+            nodeName,
+            fields = fieldMap.Keys.ToArray()
+        };
     }
 }
