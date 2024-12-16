@@ -10,6 +10,10 @@ public interface IEntity {
     public void LogInfo() {
         Console.WriteLine($"[{DateTime.Now.ToString("HH:mm:ss:fff")}] [{Name} info]: [position: {{ x: {Transform.Position.X}, y: {Transform.Position.Y} }}], [hp: {Health}]");
     }
+
+    public void Log(string msg) {
+        Console.WriteLine($"[{DateTime.Now.ToString("HH:mm:ss:fff")}] [{Name}  log]: [{msg}]");
+    }
 }
 
 public abstract class Entity(string name) : IEntity {
@@ -50,15 +54,20 @@ public class World {
     }
 
     public async Task Log() {
+        Console.WriteLine("World Running...");
         foreach (var entity in Entities) {
             entity.Start();
         }
 
         Task updateTask = Task.Run(async () => {
             while (true) {
+                Console.ForegroundColor = ConsoleColor.Green;
+                foreach (var entity in Entities) {
+                    entity.LogInfo();
+                }
+                Console.ResetColor();
                 foreach (var entity in Entities) {
                     entity.Update();
-                    entity.LogInfo();
                 }
                 await Task.Delay(updateTick);
             }
@@ -74,5 +83,6 @@ public class World {
         });
 
         await Task.WhenAny(updateTask, fixedUpdateTask, Task.Delay(overTime));
+        Console.WriteLine("World has been destoryed.");
     }
 }

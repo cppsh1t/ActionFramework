@@ -43,3 +43,38 @@ public class SequenceNode : CompositeNode {
         return State.Running;
     }
 }
+
+[NodeXmlName("wait")]
+[NodeXmlProperty("wait", "waitSecond")]
+public class WaitNode(int waitSecond) : ActionNode {
+
+    private DateTime startTime;
+    private int waitSecond = waitSecond;
+
+    public WaitNode() : this(0) {
+
+    }
+
+    public override void OnStart() {
+        startTime = DateTime.Now;
+    }
+
+    public override void OnStop() {
+
+    }
+
+    protected override void OnFixedUpdate() {
+
+    }
+
+    protected override State OnUpdate() {
+        if (startTime.AddSeconds(waitSecond) <= DateTime.Now) {
+            host?.Log($"等待计时到达, {DateTime.Now}");
+            return State.Success;
+        }
+        else {
+            host?.Log("等待中...");
+            return State.Running;
+        }
+    }
+}
