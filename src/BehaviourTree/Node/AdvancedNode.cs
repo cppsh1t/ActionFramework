@@ -28,14 +28,14 @@ public class SequenceNode : CompositeNode {
     }
 
     public sealed override State Update() {
-        if (CurrentIndex >= Nodes.Count) {
-            return State.Success;
-        }
         State currentState = OnUpdate();
 
         if (currentState == State.Failure) return State.Failure;
         if (currentState == State.Success) {
             CurrentNode.OnStop();
+            if (currentIndex + 1 >= Nodes.Count) {
+                return State.Success;
+            }
             currentIndex++;
             CurrentNode.OnStart();
         }
@@ -76,5 +76,25 @@ public class WaitNode(int waitSecond) : ActionNode {
             host?.Log("等待中...");
             return State.Running;
         }
+    }
+}
+
+public class RepeatNode : DecoratorNode {
+
+    private bool stopWhenFailure = false;
+
+    public override void OnStop() {
+
+    }
+
+    protected override void OnFixedUpdate() {
+
+    }
+
+    protected override State OnUpdate() {
+        var state = Child?.Update();
+        if (state == State.Failure && stopWhenFailure)
+            return State.Failure;
+        return State.Running;
     }
 }
