@@ -12,7 +12,7 @@ public class NodeXmlDefinition(Type nodeType, string nodeName) {
     }
 
     public static void BuildJsonFile(string filePath) {
-        string json = JsonConvert.SerializeObject(new { definitions = allDefinitions });
+        string json = JsonConvert.SerializeObject(new { definitions = allDefinitions.Select(item => item.ToJson()) });
         File.WriteAllText(filePath, json);
     }
 
