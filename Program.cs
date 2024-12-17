@@ -4,7 +4,7 @@ using ActioinFramework.BehaviourTree.Xml;
 using ActioinFramework.GameEngine;
 
 string path = "test.xml";
-NodeXmlDefinition.BuildJsonFile("node-definitions.json");
+NodeXmlDefinition.BuildJsonFile("front/BehaviourTreeBuilder/src/resources/node-definitions.json");
 NodeXmlParser parser = new();
 Node node = parser.Parse(path);
 
