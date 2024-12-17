@@ -1,7 +1,7 @@
 {
   "definitions": [
-    { "nodeName": "sequence", "fields": ["index"] },
-    { "nodeName": "wait", "fields": ["wait"] },
-    { "nodeName": "heal", "fields": ["heal", "stop"] }
+    { "nodeName": "sequence", "fields": ["index"], "type": "composite" },
+    { "nodeName": "wait", "fields": ["wait"], "type": "action" },
+    { "nodeName": "heal", "fields": ["heal", "stop"], "type": "action" }
   ]
 }

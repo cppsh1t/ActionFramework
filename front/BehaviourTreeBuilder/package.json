@@ -11,6 +11,7 @@
     "type-check": "vue-tsc --build"
   },
   "dependencies": {
+    "@vue-flow/core": "^1.41.6",
     "pinia": "^2.2.6",
     "vue": "^3.5.13",
     "vue-router": "^4.4.5"
@@ -24,6 +25,7 @@
     "element-plus": "^2.9.1",
     "npm-run-all2": "^7.0.1",
     "postcss": "^8.4.49",
+    "prettier": "^3.4.2",
     "tailwindcss": "^3.4.16",
     "typescript": "~5.6.3",
     "vite": "^6.0.1",

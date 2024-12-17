@@ -47,10 +47,24 @@ public class NodeXmlDefinition(Type nodeType, string nodeName) {
         fieldMap.Add(attributeName, fieldInfo);
     }
 
+    private string GetBaseType() {
+        if (typeof(ActionNode).IsAssignableFrom(nodeType)) {
+            return "action";
+        }
+        if (typeof(CompositeNode).IsAssignableFrom(nodeType)) {
+            return "composite";
+        }
+        if (typeof(DecoratorNode).IsAssignableFrom(nodeType)) {
+            return "decorator";
+        }
+        throw new InvalidOperationException($"非法节点类型: {nodeType}");
+    }
+
     public object ToJson() {
         return new {
             nodeName,
-            fields = fieldMap.Keys.ToArray()
+            fields = fieldMap.Keys.ToArray(),
+            type = GetBaseType()
         };
     }
 }

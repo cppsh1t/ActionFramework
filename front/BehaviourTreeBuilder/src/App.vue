@@ -1,9 +1,11 @@
 <script setup lang="ts">
-import { RouterView } from "vue-router";
+import { RouterView } from "vue-router"
 </script>
 
 <template>
-  <RouterView />
+  <div class="w-full h-full">
+    <RouterView class="w-full h-full" />
+  </div>
 </template>
 
 <style scoped></style>

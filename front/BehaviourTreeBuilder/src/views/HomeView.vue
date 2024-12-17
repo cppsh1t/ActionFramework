@@ -1,5 +1,7 @@
 <template>
-  <h1 class="text-3xl font-bold">Hello world!</h1>
+  <GraphView class="w-full h-full" />
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import GraphView from "@/components/GraphView.vue"
+</script>
