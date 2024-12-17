@@ -1,5 +1,5 @@
 <template>
-  <VueFlow class="flow-graph" :nodes="nodes" :edges="edges">
+  <VueFlow v-model:nodes="nodes" :edges="edges">
     <!-- bind your custom node type to a component by using slots, slot names are always `node-<type>` -->
     <template #node-special="specialNodeProps">
       <SpecialNode v-bind="specialNodeProps" />
@@ -9,13 +9,19 @@
     <template #edge-special="specialEdgeProps">
       <SpecialEdge v-bind="specialEdgeProps" />
     </template>
+
+    <Panel position="top-right">
+      <div class="p-[20px] bg-slate-100 rounded-xl">
+        <el-button type="primary" @click="addNode">Add a node</el-button>
+      </div>
+    </Panel>
   </VueFlow>
 </template>
 
 <script setup lang="ts">
 import { ref } from "vue"
 import type { Node, Edge } from "@vue-flow/core"
-import { VueFlow } from "@vue-flow/core"
+import { VueFlow, Panel } from "@vue-flow/core"
 
 // these components are only shown as examples of how to use a custom node or edge
 // you can find many examples of how to create these custom components in the examples page of the docs
@@ -95,14 +101,14 @@ const edges = ref<Edge[]>([
     },
   },
 ])
-</script>
 
-<style scoped lang="css">
-.flow-grpah {
-  background-image:
-    linear-gradient(to right, #333 1px, transparent 1px),
-    /* 垂直线 */ linear-gradient(to bottom, #333 1px, transparent 1px); /* 水平线 */
-  background-size: 20px 20px; /* 调整网格大小 */
-  background-color: #222; /* 背景底色 */
+function addNode() {
+  const id = Date.now().toString()
+
+  nodes.value.push({
+    id,
+    position: { x: 150, y: 50 },
+    data: { label: `Node ${id}` },
+  })
 }
-</style>
+</script>

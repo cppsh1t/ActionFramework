@@ -19,6 +19,7 @@ public class NodeXmlParser {
 
         foreach (XmlAttribute xmlAttribute in xmlNode.Attributes) {
             string attrName = xmlAttribute.Name;
+            if (attrName == "x" || attrName == "y") continue;
             string attrValue = xmlAttribute.Value;
             FieldInfo fieldInfo = definition.fieldMap[attrName];
             Type fieldType = fieldInfo.FieldType;
