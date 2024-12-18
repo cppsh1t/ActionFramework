@@ -6,26 +6,25 @@ public class TaskNameAttribute(string name) : Attribute {
 }
 
 public abstract class Task {
-#pragma warning disable CS8618 
-    protected Brain brain;
-#pragma warning restore CS8618 
 
-    public virtual void Init(Brain brain) {
-        this.brain = brain;
+    public enum State {
+        Running,
+        Success,
+        Failure
     }
 
-    public bool Do() {
-        if (!Predicate()) return false;
-        if (!OnDo()) return false;
-        Effect();
-        return true;
+    public State Do(Brain planTimeBrain, Brain realTimeBrain) {
+        if (!Predicate(planTimeBrain)) return State.Failure;
+        State result = OnDo(planTimeBrain, realTimeBrain);
+        Effect(result, planTimeBrain, realTimeBrain);
+        return result;
     }
 
-    protected abstract bool OnDo();
+    protected abstract State OnDo(Brain planTimeBrain, Brain realTimeBrain);
 
-    public abstract bool Predicate();
+    public abstract bool Predicate(Brain planTimeBrain);
 
-    public abstract void Effect();
+    public abstract void Effect(State state, Brain planTimeBrain, Brain realTimeBrain);
 }
 
 public abstract class PrimitiveTask : Task {
@@ -34,19 +33,19 @@ public abstract class PrimitiveTask : Task {
     public List<Predicate<Brain>> Conditions => conditions;
 
 
-    protected List<Predicate<Brain>> effects = [];
+    protected List<Func<State, Brain, Brain, bool>> effects = [];
 
-    public List<Predicate<Brain>> Effects => effects;
+    public List<Func<State, Brain, Brain, bool>> Effects => effects;
 
-    public override bool Predicate() {
+    public override bool Predicate(Brain planTimeBrain) {
         for (int i = 0; i < conditions.Count; i++) {
-            if (!conditions[i](brain)) return false;
+            if (!conditions[i](planTimeBrain)) return false;
         }
         return true;
     }
 
-    public override void Effect() {
-        effects.ForEach(func => func(brain));
+    public override void Effect(State state, Brain planTimeBrain, Brain realTimeBrain) {
+        effects.ForEach(func => func(state, planTimeBrain, realTimeBrain));
     }
 }
 
@@ -57,6 +56,8 @@ public class Method {
 
 public class CompoundTask : Task {
     protected Method? currentMethod;
+
+    //TODO: 列表改用优先队列
     private List<Method> methods = [];
     public void AddMethod(Method method) {
         methods.Add(method);
@@ -66,17 +67,17 @@ public class CompoundTask : Task {
         methods.Remove(method);
     }
 
-    protected override bool OnDo() {
+    protected override State OnDo(Brain planTimeBrain, Brain realTimeBrain) {
         for (int i = 0; i < currentMethod!.tasks.Count; i++) {
-            if (!currentMethod!.tasks[i].Do()) return false;
+            if (currentMethod!.tasks[i].Do(planTimeBrain, realTimeBrain) == State.Failure) return State.Failure;
         }
-        return true;
+        return State.Success;
     }
 
-    public override bool Predicate() {
+    public override bool Predicate(Brain planTimeBrain) {
         if (currentMethod != null) {
             for (int i = 0; i < currentMethod.tasks.Count; i++) {
-                if (!currentMethod!.tasks[i].Predicate()) return false;
+                if (!currentMethod!.tasks[i].Predicate(planTimeBrain)) return false;
             }
             return true;
         }
@@ -85,7 +86,7 @@ public class CompoundTask : Task {
                 Method currentLoopMethod = methods[i];
                 bool jumpToNext = false;
                 for (int y = 0; y < currentLoopMethod.tasks.Count; y++) {
-                    if (!currentLoopMethod.tasks[y].Predicate()) {
+                    if (!currentLoopMethod.tasks[y].Predicate(planTimeBrain)) {
                         jumpToNext = true;
                         break;
                     }
@@ -98,9 +99,9 @@ public class CompoundTask : Task {
         }
     }
 
-    public override void Effect() {
+    public override void Effect(State state, Brain planTimeBrain, Brain realTimeBrain) {
         for (int i = 0; i < currentMethod!.tasks.Count; i++) {
-            currentMethod!.tasks[i].Effect();
+            currentMethod!.tasks[i].Effect(state, planTimeBrain, realTimeBrain);
         }
     }
 }
